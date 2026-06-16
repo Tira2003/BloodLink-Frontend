@@ -7,8 +7,6 @@ import HowItWorksSection from '../components/home/HowItWorksSection';
 import VoicesSection from '../components/home/VoicesSection';
 import CommunityStoriesSection from '../components/home/CommunityStoriesSection';
 import FaqSection from '../components/home/FaqSection';
-import CtaBanner from '../components/home/CtaBanner';
-
 export default function Home() {
   return (
     <PageLayout showFooter flushTop>
@@ -20,7 +18,6 @@ export default function Home() {
       <VoicesSection />
       <CommunityStoriesSection />
       <FaqSection />
-      <CtaBanner />
     </PageLayout>
   );
 }

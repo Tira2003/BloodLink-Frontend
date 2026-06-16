@@ -1,3 +1,4 @@
+
 import { useNavigate } from 'react-router-dom';
 import { Heart, Droplets, ChevronRight } from 'lucide-react';
 import { mockStats } from '../../data/mockData';
@@ -8,8 +9,8 @@ export default function HeroSection() {
   const navigate = useNavigate();
 
   return (
-    // HERO SECTION — top/bottom padding for whole hero
-    // ↑ Increase pt-* to push ALL content down | Increase pb-* for more space below image
+    // HERO SECTION
+    
     <section className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-bg via-cyan-50 to-green-50 pt-24 pb-12 md:pt-28 md:pb-16">
       <HeroGridPattern />
       <div className="relative z-10 mx-auto w-full max-w-7xl px-6 lg:px-10">
@@ -53,22 +54,7 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/*
-          IMAGE POSITION — main control for moving image up/down relative to CTA buttons:
-
-          -mt-*  → moves image UP (closer to buttons). Bigger number = higher.
-                   e.g. -mt-6 → -mt-16 or lg:-mt-20
-
-          mt-*   → moves image DOWN (away from buttons). Use positive instead of negative.
-                   e.g. change -mt-6 to mt-4 or mt-8
-
-          md:-mt-10 / lg:-mt-12 → same rules at tablet/desktop breakpoints
-
-          object-top    → crops/aligns from top of image file (hands sit higher)
-          object-center → centers the artwork vertically in the image box
-
-          Optional fine-tune: add translate-y-4 (down) or -translate-y-4 (up)
-        */}
+        
         <img
           src="/Background1.png"
           alt="Cupped hands receiving a drop of blood, symbolizing life-saving donation"
