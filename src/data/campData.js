@@ -1,0 +1,32 @@
+export const MOCK_CAMPS = [
+  {
+    id: 1, name: 'Community Blood Drive 2026',
+    organizer: 'National Hospital Colombo', district: 'Colombo',
+    location: 'National Hospital Colombo, Ward Place',
+    date: '2026-06-25', startTime: '08:00', endTime: '14:00',
+    bloodTypesNeeded: ['O+', 'O-', 'A+', 'B+'],
+    contactPhone: '+94 11 269 1111', contactEmail: 'blood@nhc.lk',
+    notes: 'Walk-in donors welcome. Bring your NIC.',
+    targetUnits: 100, registeredDonors: 42,
+  },
+  {
+    id: 2, name: 'Kandy Blood Donation Camp',
+    organizer: 'Kandy Teaching Hospital', district: 'Kandy',
+    location: 'Kandy Teaching Hospital, Kandy',
+    date: '2026-07-05', startTime: '09:00', endTime: '15:00',
+    bloodTypesNeeded: ['A-', 'B-', 'AB-', 'O-'],
+    contactPhone: '+94 81 222 2261', contactEmail: 'info@kthhospital.lk',
+    notes: 'Rare blood types especially needed. Light refreshments provided.',
+    targetUnits: 60, registeredDonors: 18,
+  },
+  {
+    id: 3, name: 'Galle District Mega Drive',
+    organizer: 'Galle General Hospital', district: 'Galle',
+    location: 'Galle Face Hotel Premises, Galle',
+    date: '2026-07-12', startTime: '07:00', endTime: '13:00',
+    bloodTypesNeeded: ['A+', 'B+', 'O+', 'AB+'],
+    contactPhone: '+94 91 222 2261', contactEmail: '',
+    notes: '',
+    targetUnits: 80, registeredDonors: 9,
+  },
+];
