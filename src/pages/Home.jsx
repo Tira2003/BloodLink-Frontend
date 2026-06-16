@@ -1,7 +1,6 @@
 import PageLayout from '../components/layout/PageLayout';
 import HeroSection from '../components/home/HeroSection';
 import ImpactStatsSection from '../components/home/ImpactStatsSection';
-import BloodGroupsBar from '../components/home/BloodGroupsBar';
 import FeaturesSection from '../components/home/FeaturesSection';
 import HowItWorksSection from '../components/home/HowItWorksSection';
 import VoicesSection from '../components/home/VoicesSection';
@@ -12,7 +11,6 @@ export default function Home() {
     <PageLayout showFooter flushTop>
       <HeroSection />
       <ImpactStatsSection />
-      <BloodGroupsBar />
       <FeaturesSection />
       <HowItWorksSection />
       <VoicesSection />
