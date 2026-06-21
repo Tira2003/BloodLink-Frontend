@@ -174,7 +174,7 @@ The landing page. Includes:
 ## 📁 Project Structure
 
 ```
-se project/
+BloodLink/
 ├── public/                    # Static assets
 ├── src/
 │   ├── components/            # Reusable UI components
