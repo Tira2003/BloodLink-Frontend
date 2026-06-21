@@ -1,0 +1,15 @@
+package com.bloodlink.notification.entity;
+
+public enum NotificationType {
+    DONATION_REQUEST,
+    APPOINTMENT_REMINDER,
+    DONATION_COMPLETED,
+    INVENTORY_ALERT,
+    BLOOD_REQUEST,
+    APPOINTMENT_CONFIRMED,
+    APPOINTMENT_CANCELLED,
+    URGENT_BLOOD_NEEDED,
+    HOSPITAL_MESSAGE,
+    SYSTEM_ALERT,
+    OTHER
+}

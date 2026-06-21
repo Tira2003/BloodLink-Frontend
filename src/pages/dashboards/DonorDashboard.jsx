@@ -1,16 +1,49 @@
-import { Heart, MapPin, Calendar, CheckCircle, Clock, Bell, Plus } from 'lucide-react';
+import { Heart, MapPin, Calendar, CheckCircle, Clock, Bell, Plus, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import Sidebar from '../../components/common/Sidebar';
 import { useAuth } from '../../context/AuthContext';
-import { mockRequests, mockNotifications, mockDonors } from '../../data/mockData';
+import { donationService } from '../../services/donationService';
+import { notificationService } from '../../services/notificationService';
 
 const URGENCY_COLORS = { CRITICAL: 'badge-critical', HIGH: 'badge-high', MEDIUM: 'badge-medium', LOW: 'badge-low' };
 const STATUS_COLORS = { PENDING: 'badge-pending', MATCHED: 'badge-matched', IN_PROGRESS: 'badge-in-progress', COMPLETED: 'badge-completed' };
 
 export default function DonorDashboard() {
   const { user } = useAuth();
-  const pendingRequests = mockRequests.filter(r => r.status === 'PENDING').slice(0, 3);
-  const unreadNotifs = mockNotifications.filter(n => !n.isRead);
+  const [donations, setDonations] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [unreadNotifications, setUnreadNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const loadDonorData = async () => {
+      try {
+        setLoading(true);
+        if (user?.id) {
+          const [donationList, appointmentList, unreadNotifs] = await Promise.all([
+            donationService.getDonationsByDonor(user.id).catch(() => []),
+            donationService.getAppointmentsByDonor(user.id).catch(() => []),
+            notificationService.getUnreadNotifications(user.id).catch(() => []),
+          ]);
+          setDonations(Array.isArray(donationList) ? donationList : []);
+          setAppointments(Array.isArray(appointmentList) ? appointmentList : []);
+          setUnreadNotifications(Array.isArray(unreadNotifs) ? unreadNotifs : []);
+        }
+      } catch (err) {
+        console.error('Error loading donor data:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDonorData();
+  }, [user?.id]);
+
+  const completedDonations = donations.filter(d => d.status === 'COMPLETED').length;
+  const upcomingAppointments = appointments.filter(a => new Date(a.appointmentDate) > new Date()).slice(0, 3);
 
   return (
     <div className="page-layout">
@@ -61,107 +94,126 @@ export default function DonorDashboard() {
           </div>
         </div>
 
-        {/* Stats Row */}
-        <div className="dashboard-grid grid-cols-4 mb-6">
-          {[
-            { label: 'Total Donations', value: '12', icon: Heart, color: 'var(--red-400)', bg: 'rgba(244,63,94,0.1)' },
-            { label: 'Pending Matches', value: pendingRequests.length, icon: Clock, color: 'var(--accent-amber)', bg: 'rgba(245,158,11,0.1)' },
-            { label: 'Notifications', value: unreadNotifs.length, icon: Bell, color: 'var(--accent-blue)', bg: 'rgba(59,130,246,0.1)' },
-            { label: 'Last Donated', value: 'Mar 2025', icon: Calendar, color: 'var(--accent-emerald)', bg: 'rgba(16,185,129,0.1)' },
-          ].map(({ label, value, icon: Icon, color, bg }) => (
-            <div key={label} className="glass-card stat-card">
-              <div className="flex items-center justify-between mb-3">
-                <div style={{ width: '40px', height: '40px', borderRadius: 'var(--radius-md)', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color }}>
-                  <Icon size={20} />
+        {error && (
+          <div className="glass-card glass-card-error mb-6 flex items-center gap-3">
+            <AlertCircle size={20} color="var(--red-400)" />
+            <span className="text-sm">{error}</span>
+          </div>
+        )}
+
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="loading-spinner-dark" />
+          </div>
+        ) : (
+          <>
+            {/* Stats Row */}
+            <div className="dashboard-grid grid-cols-4 mb-6">
+              {[
+                { label: 'Total Donations', value: completedDonations, icon: Heart, color: 'var(--red-400)', bg: 'rgba(244,63,94,0.1)' },
+                { label: 'Upcoming Appointments', value: upcomingAppointments.length, icon: Clock, color: 'var(--accent-amber)', bg: 'rgba(245,158,11,0.1)' },
+                { label: 'Notifications', value: unreadNotifications.length, icon: Bell, color: 'var(--accent-blue)', bg: 'rgba(59,130,246,0.1)' },
+                { label: 'Last Donated', value: donations.length > 0 ? 'Recent' : 'Never', icon: Calendar, color: 'var(--accent-emerald)', bg: 'rgba(16,185,129,0.1)' },
+              ].map(({ label, value, icon: Icon, color, bg }) => (
+                <div key={label} className="glass-card stat-card">
+                  <div className="flex items-center justify-between mb-3">
+                    <div style={{ width: '40px', height: '40px', borderRadius: 'var(--radius-md)', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color }}>
+                      <Icon size={20} />
+                    </div>
+                  </div>
+                  <div className="font-extrabold text-3xl text-primary mb-1">{value}</div>
+                  <div className="text-sm text-muted">{label}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="dashboard-grid grid-cols-2">
+              {/* Upcoming Appointments */}
+              <div className="glass-card col-span-2">
+                <div className="card-header">
+                  <h3 className="font-bold flex items-center gap-2">
+                    <Calendar size={18} color="var(--red-400)" /> Upcoming Appointments
+                  </h3>
+                  <Link to="/appointments" className="btn btn-ghost btn-sm">View All →</Link>
+                </div>
+                <div className="card-body">
+                  {upcomingAppointments.length === 0 ? (
+                    <p className="text-secondary text-center py-4">No upcoming appointments.</p>
+                  ) : (
+                    upcomingAppointments.map(apt => (
+                      <div key={apt.id} className="flex items-start gap-3 mb-4 p-3 rounded-lg"
+                        style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-md)' }}>
+                        <div className="blood-badge">{user?.bloodType}</div>
+                        <div style={{ flex: 1 }}>
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <span className="font-semibold text-primary text-sm">{new Date(apt.appointmentDate).toLocaleDateString()}</span>
+                            <span className={`badge ${apt.status === 'CONFIRMED' ? 'badge-completed' : 'badge-pending'}`}>{apt.status}</span>
+                          </div>
+                          <div className="text-xs text-secondary">{apt.collectionCenter || 'TBD'}</div>
+                        </div>
+                        <button className="btn btn-primary btn-sm flex-shrink-0" id={`book-${apt.id}`}>
+                          Details
+                        </button>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
-              <div className="font-extrabold text-3xl text-primary mb-1">{value}</div>
-              <div className="text-sm text-muted">{label}</div>
-            </div>
-          ))}
-        </div>
 
-        <div className="dashboard-grid grid-cols-2">
-          {/* Matching Requests */}
-          <div className="glass-card col-span-2">
-            <div className="card-header">
-              <h3 className="font-bold flex items-center gap-2">
-                <Heart size={18} color="var(--red-400)" /> Requests Matching Your Blood Type ({user?.bloodType})
-              </h3>
-              <Link to="/requests" className="btn btn-ghost btn-sm">View All →</Link>
-            </div>
-            <div className="card-body">
-              {pendingRequests.length === 0 ? (
-                <p className="text-secondary text-center py-4">No matching requests right now.</p>
-              ) : (
-                pendingRequests.map(req => (
-                  <div key={req.id} className="flex items-start gap-3 mb-4 p-3 rounded-lg"
-                    style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-md)' }}>
-                    <div className="blood-badge">{req.bloodType}</div>
-                    <div style={{ flex: 1 }}>
-                      <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className="font-semibold text-primary text-sm">{req.patientName}</span>
-                        <span className={`badge ${URGENCY_COLORS[req.urgency]}`}>{req.urgency}</span>
+              {/* Notifications */}
+              <div className="glass-card">
+                <div className="card-header">
+                  <h3 className="font-bold flex items-center gap-2">
+                    <Bell size={18} color="var(--accent-blue)" /> Notifications
+                    {unreadNotifications.length > 0 && <span className="badge badge-critical">{unreadNotifications.length}</span>}
+                  </h3>
+                </div>
+                <div className="card-body" style={{ paddingTop: '0.5rem' }}>
+                  {unreadNotifications.length === 0 ? (
+                    <p className="text-secondary text-center text-sm py-4">No unread notifications</p>
+                  ) : (
+                    unreadNotifications.slice(0, 4).map(n => (
+                      <div key={n.id} className="notif-item" style={{ borderRadius: 'var(--radius-md)', marginBottom: '0.75rem' }}>
+                        <div className="notif-dot" />
+                        <div>
+                          <div className="font-semibold text-sm text-primary">{n.title}</div>
+                          <div className="text-xs text-secondary" style={{ marginTop: '0.2rem' }}>{n.message}</div>
+                        </div>
                       </div>
-                      <div className="text-xs text-secondary">{req.hospital} · {req.city}</div>
-                    </div>
-                    <button className="btn btn-primary btn-sm flex-shrink-0" id={`volunteer-${req.id}`}>
-                      Volunteer
-                    </button>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Notifications */}
-          <div className="glass-card">
-            <div className="card-header">
-              <h3 className="font-bold flex items-center gap-2">
-                <Bell size={18} color="var(--accent-blue)" /> Notifications
-                {unreadNotifs.length > 0 && <span className="badge badge-critical">{unreadNotifs.length}</span>}
-              </h3>
-            </div>
-            <div className="card-body" style={{ paddingTop: '0.5rem' }}>
-              {mockNotifications.slice(0, 4).map(n => (
-                <div key={n.id} className={`notif-item ${!n.isRead ? 'unread' : ''}`} style={{ borderRadius: 'var(--radius-md)' }}>
-                  {!n.isRead && <div className="notif-dot" />}
-                  <div>
-                    <div className="font-semibold text-sm text-primary">{n.title}</div>
-                    <div className="text-xs text-secondary" style={{ marginTop: '0.2rem' }}>{n.message}</div>
-                  </div>
+                    ))
+                  )}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          {/* Donation History */}
-          <div className="glass-card">
-            <div className="card-header">
-              <h3 className="font-bold flex items-center gap-2">
-                <CheckCircle size={18} color="var(--accent-emerald)" /> Recent Donations
-              </h3>
-            </div>
-            <div className="card-body">
-              {[
-                { hospital: 'National Hospital Colombo', date: 'Mar 10, 2025', units: 1, verified: true },
-                { hospital: 'Kandy Teaching Hospital', date: 'Dec 1, 2024', units: 1, verified: true },
-                { hospital: 'Galle General Hospital', date: 'Sep 5, 2024', units: 1, verified: true },
-              ].map((d, i) => (
-                <div key={i} className="flex items-center gap-3 mb-4">
-                  <div style={{ width: '36px', height: '36px', borderRadius: 'var(--radius-md)', background: 'rgba(16,185,129,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <CheckCircle size={16} color="var(--accent-emerald)" />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div className="text-sm font-semibold text-primary">{d.hospital}</div>
-                    <div className="text-xs text-muted">{d.date}</div>
-                  </div>
-                  <span className="badge badge-completed">Verified</span>
+              {/* Donation History */}
+              <div className="glass-card">
+                <div className="card-header">
+                  <h3 className="font-bold flex items-center gap-2">
+                    <CheckCircle size={18} color="var(--accent-emerald)" /> Recent Donations
+                  </h3>
                 </div>
-              ))}
+                <div className="card-body">
+                  {donations.length === 0 ? (
+                    <p className="text-secondary text-center text-sm py-4">No donation history yet</p>
+                  ) : (
+                    donations.slice(0, 3).map((d, i) => (
+                      <div key={i} className="flex items-center gap-3 mb-4">
+                        <div style={{ width: '36px', height: '36px', borderRadius: 'var(--radius-md)', background: 'rgba(16,185,129,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <CheckCircle size={16} color="var(--accent-emerald)" />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div className="text-sm font-semibold text-primary">{d.quantityMl}ml Donation</div>
+                          <div className="text-xs text-muted">{new Date(d.donationDate).toLocaleDateString()}</div>
+                        </div>
+                        <span className={`badge ${d.status === 'COMPLETED' ? 'badge-completed' : 'badge-pending'}`}>{d.status}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </>
+        )}
       </main>
     </div>
   );

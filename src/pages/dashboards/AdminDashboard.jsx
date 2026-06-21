@@ -1,10 +1,13 @@
+import { useState, useEffect } from 'react';
 import { Users, Droplets, Heart, BarChart3, TrendingUp, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 import Sidebar from '../../components/common/Sidebar';
-import { mockStats, mockChartData, mockRequests, mockDonors, mockInventory } from '../../data/mockData';
+import { inventoryService } from '../../services/inventoryService';
+import { donationService } from '../../services/donationService';
+import { mockChartData } from '../../data/mockData';
 
 const COLORS = ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#f97316', '#06b6d4'];
 
@@ -25,7 +28,26 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function AdminDashboard() {
-  const criticalInventory = mockInventory.filter(i => i.units < i.lowThreshold);
+  const [stats, setStats] = useState({ totalDonations: 0, criticalInventory: 0, activeAppointments: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const expiredInv = await inventoryService.getExpiredInventory().catch(() => []);
+        setStats({
+          totalDonations: 0,
+          criticalInventory: Array.isArray(expiredInv) ? expiredInv.length : 0,
+          activeAppointments: 0,
+        });
+      } catch (err) {
+        console.error('Error loading admin stats:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadStats();
+  }, []);
 
   return (
     <div className="page-layout">
@@ -36,28 +58,34 @@ export default function AdminDashboard() {
           <p className="page-subtitle">System-wide analytics and management overview</p>
         </div>
 
-        {/* Top Stats */}
-        <div className="dashboard-grid grid-cols-4 mb-6">
-          {[
-            { label: 'Total Donors', value: mockStats.totalDonors.toLocaleString(), icon: Users, color: 'var(--red-400)', bg: 'rgba(244,63,94,0.1)', change: '+12%' },
-            { label: 'Blood Requests', value: mockStats.totalRequests, icon: Droplets, color: 'var(--accent-blue)', bg: 'rgba(59,130,246,0.1)', change: '+8%' },
-            { label: 'Lives Saved', value: mockStats.livesSaved, icon: Heart, color: 'var(--accent-emerald)', bg: 'rgba(16,185,129,0.1)', change: '+15%' },
-            { label: 'Active Requests', value: mockStats.activeRequests, icon: Clock, color: 'var(--accent-amber)', bg: 'rgba(245,158,11,0.1)', change: '+3' },
-          ].map(({ label, value, icon: Icon, color, bg, change }) => (
-            <div key={label} className="glass-card stat-card">
-              <div className="flex items-center justify-between mb-3">
-                <div style={{ width: '40px', height: '40px', borderRadius: 'var(--radius-md)', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color }}>
-                  <Icon size={20} />
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="loading-spinner-dark" />
+          </div>
+        ) : (
+          <>
+            {/* Top Stats */}
+            <div className="dashboard-grid grid-cols-4 mb-6">
+              {[
+                { label: 'Total Donors', value: '250+', icon: Users, color: 'var(--red-400)', bg: 'rgba(244,63,94,0.1)', change: '+12%' },
+                { label: 'Blood Requests', value: '124', icon: Droplets, color: 'var(--accent-blue)', bg: 'rgba(59,130,246,0.1)', change: '+8%' },
+                { label: 'Lives Saved', value: '1800+', icon: Heart, color: 'var(--accent-emerald)', bg: 'rgba(16,185,129,0.1)', change: '+15%' },
+                { label: 'Critical Alerts', value: stats.criticalInventory, icon: Clock, color: 'var(--accent-amber)', bg: 'rgba(245,158,11,0.1)', change: stats.criticalInventory > 0 ? '+!' : '✓' },
+              ].map(({ label, value, icon: Icon, color, bg, change }) => (
+                <div key={label} className="glass-card stat-card">
+                  <div className="flex items-center justify-between mb-3">
+                    <div style={{ width: '40px', height: '40px', borderRadius: 'var(--radius-md)', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color }}>
+                      <Icon size={20} />
+                    </div>
+                    <span className="text-xs font-semibold" style={{ color: 'var(--accent-emerald)' }}>
+                      <TrendingUp size={12} style={{ display: 'inline', marginRight: '2px' }} />{change}
+                    </span>
+                  </div>
+                  <div className="font-extrabold text-3xl text-primary mb-1">{value}</div>
+                  <div className="text-sm text-muted">{label}</div>
                 </div>
-                <span className="text-xs font-semibold" style={{ color: 'var(--accent-emerald)' }}>
-                  <TrendingUp size={12} style={{ display: 'inline', marginRight: '2px' }} />{change}
-                </span>
-              </div>
-              <div className="font-extrabold text-3xl text-primary mb-1">{value}</div>
-              <div className="text-sm text-muted">{label}</div>
+              ))}
             </div>
-          ))}
-        </div>
 
         {/* Charts row */}
         <div className="dashboard-grid grid-cols-2 mb-6">
@@ -231,6 +259,8 @@ export default function AdminDashboard() {
             </table>
           </div>
         </div>
+          </>
+        )}
       </main>
     </div>
   );
