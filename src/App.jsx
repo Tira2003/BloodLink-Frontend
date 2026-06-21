@@ -15,9 +15,24 @@ import HospitalDashboard from './pages/dashboards/HospitalDashboard';
 import RecipientDashboard from './pages/dashboards/RecipientDashboard';
 
 function ProtectedRoute({ children, requiredRole }) {
-  const { user } = useAuth();
-  if (!user) return <Navigate to="/login" replace />;
-  if (requiredRole && user.role !== requiredRole) return <Navigate to="/" replace />;
+  const { user, isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="page-loader">
+        <div className="loading-spinner-dark" />
+      </div>
+    );
+  }
+  
+  if (!isAuthenticated || !user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (requiredRole && user.role !== requiredRole) {
+    return <Navigate to="/" replace />;
+  }
+  
   return children;
 }
 

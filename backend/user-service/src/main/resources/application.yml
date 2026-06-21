@@ -40,3 +40,8 @@ logging:
     com.bloodlink: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+app:
+  jwtSecret: ${JWT_SECRET:MyVerySecureSecretKeyForBloodLinkApplicationThatIsAtLeast32CharactersLongForJWTTokenGeneration}
+  jwtExpirationMs: ${JWT_EXPIRATION_MS:86400000}
+  jwtRefreshExpirationMs: ${JWT_REFRESH_EXPIRATION_MS:604800000}

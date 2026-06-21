@@ -15,17 +15,8 @@ export default function Register() {
     setLoading(true);
     setServerError('');
     try {
-      await authService.register({
-        fullName: form.fullName,
-        email: form.email,
-        phone: form.phone,
-        age: parseInt(form.age),
-        district: form.district,
-        nearestHospital: form.nearestHospital,
-        bloodType: form.bloodType,
-        password: form.password,
-        role: 'DONOR',
-      });
+      // Register returns auth response with access/refresh tokens and user info
+      await authService.register(form);
       setSuccess(true);
     } catch (err) {
       setServerError(err.message || 'Registration failed. Please try again.');

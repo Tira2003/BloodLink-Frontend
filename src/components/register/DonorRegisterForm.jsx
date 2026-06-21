@@ -44,7 +44,23 @@ export default function DonorRegisterForm({ onSubmit, loading, serverError }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
-    onSubmit(form);
+    // Map frontend form to backend API format
+    const [firstName, ...lastNameParts] = form.fullName.split(' ');
+    const lastName = lastNameParts.join(' ') || 'User';
+    
+    onSubmit({
+      firstName,
+      lastName,
+      email: form.email,
+      password: form.password,
+      role: 'DONOR',
+      // Additional donor info - will be stored in subsequent donor profile creation
+      phone: form.phone,
+      age: form.age,
+      district: form.district,
+      nearestHospital: form.nearestHospital,
+      bloodType: form.bloodType,
+    });
   };
 
   return (

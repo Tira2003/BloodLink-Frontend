@@ -1,8 +1,10 @@
 package com.bloodlink.user.controller;
 
+import com.bloodlink.user.dto.AuthResponse;
 import com.bloodlink.user.dto.RegisterRequest;
 import com.bloodlink.user.dto.UserDTO;
 import com.bloodlink.user.entity.UserRole;
+import com.bloodlink.user.service.AuthService;
 import com.bloodlink.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,15 +20,17 @@ import java.util.UUID;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:3000", "http://127.0.0.1:5173"})
 public class UserController {
 
     private final UserService userService;
+    private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponse> registerUser(@Valid @RequestBody RegisterRequest request) {
         log.info("Received registration request for email: {}", request.getEmail());
-        UserDTO userDTO = userService.registerUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
+        AuthResponse response = authService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}")

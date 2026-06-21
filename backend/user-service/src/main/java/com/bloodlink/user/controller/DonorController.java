@@ -1,11 +1,13 @@
 package com.bloodlink.user.controller;
 
 import com.bloodlink.user.dto.DonorDTO;
+import com.bloodlink.user.security.RequireRole;
 import com.bloodlink.user.service.DonorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -16,11 +18,13 @@ import java.util.UUID;
 @RequestMapping("/api/donors")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:3000", "http://127.0.0.1:5173"})
 public class DonorController {
 
     private final DonorService donorService;
 
     @PostMapping("/{userId}")
+    @PreAuthorize("hasRole('DONOR') or hasRole('ADMIN')")
     public ResponseEntity<DonorDTO> createDonor(@PathVariable UUID userId, @Valid @RequestBody DonorDTO donorDTO) {
         log.info("Creating donor record for user: {}", userId);
         DonorDTO createdDonor = donorService.createDonor(userId, donorDTO);
@@ -49,6 +53,7 @@ public class DonorController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('DONOR') or hasRole('ADMIN')")
     public ResponseEntity<DonorDTO> updateDonor(@PathVariable UUID id, @Valid @RequestBody DonorDTO donorDTO) {
         log.info("Updating donor with ID: {}", id);
         DonorDTO updatedDonor = donorService.updateDonor(id, donorDTO);
@@ -56,6 +61,7 @@ public class DonorController {
     }
 
     @PostMapping("/{id}/record-donation")
+    @PreAuthorize("hasRole('STAFF') or hasRole('ADMIN')")
     public ResponseEntity<DonorDTO> recordDonation(@PathVariable UUID id) {
         log.info("Recording donation for donor: {}", id);
         DonorDTO updatedDonor = donorService.recordDonation(id);
@@ -63,6 +69,7 @@ public class DonorController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteDonor(@PathVariable UUID id) {
         log.info("Deleting donor with ID: {}", id);
         donorService.deleteDonor(id);
