@@ -1,7 +1,7 @@
 import { apiFetch } from './api';
 import { tryDemoLogin } from '../data/demoUsers';
 
-function persistSession(data) {
+export function persistSession(data) {
   if (data.token) {
     localStorage.setItem('bl_token', data.token);
   }

@@ -17,6 +17,7 @@ export default function CreateCampModal({ open, onClose, onCreated }) {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState('');
 
   const update = (k, v) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -48,6 +49,7 @@ export default function CreateCampModal({ open, onClose, onCreated }) {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
+    setServerError('');
     try {
       const created = await campService.create({
         ...form,
@@ -56,7 +58,7 @@ export default function CreateCampModal({ open, onClose, onCreated }) {
       onCreated(created);
       onClose();
     } catch (err) {
-      alert(err.message || 'Failed to create camp. Please try again.');
+      setServerError(err.message || 'Failed to create camp. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -70,6 +72,11 @@ export default function CreateCampModal({ open, onClose, onCreated }) {
         onClose={onClose}
       />
       <ModalBody>
+        {serverError && (
+          <div role="alert" className="bg-red-light border border-red rounded-lg p-3.5 text-red-dark text-sm mb-4">
+            {serverError}
+          </div>
+        )}
         <form id="create-camp-form" onSubmit={handleSubmit} noValidate>
           <div className="grid sm:grid-cols-2 gap-4">
             <FormGroup className="sm:col-span-2">

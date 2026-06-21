@@ -19,8 +19,16 @@ export default function LoginForm() {
 
   const from = location.state?.from?.pathname || '/requests';
 
+  // Redirect to the right place based on role
+  const getDefaultRoute = (role) => {
+    if (role === 'HOSPITAL')  return '/dashboard/hospital';
+    if (role === 'DONOR')     return '/requests';
+    if (role === 'RECIPIENT') return '/requests';
+    return from;
+  };
+
   if (user) {
-    navigate(user.role === 'DONOR' ? '/requests' : from, { replace: true });
+    navigate(getDefaultRoute(user.role), { replace: true });
     return null;
   }
 
@@ -34,7 +42,7 @@ export default function LoginForm() {
     setError('');
     try {
       const loggedIn = await login(email, password);
-      navigate(loggedIn.role === 'DONOR' ? '/requests' : from, { replace: true });
+      navigate(getDefaultRoute(loggedIn.role), { replace: true });
     } catch (err) {
       setError(err.message || 'Invalid email or password. Please try again.');
     } finally {
@@ -47,10 +55,49 @@ export default function LoginForm() {
       <RegisterHeader title="Welcome back" subtitle="Sign in to check blood requests and your profile" />
 
       <div className="bg-surface border border-border-subtle rounded-2xl p-8 shadow-sm">
-        <div className="bg-primary-light border border-border rounded-lg p-3.5 text-sm text-primary-dark mb-5">
-          <p className="font-semibold mb-2">Demo accounts</p>
-          <p><strong>Donor:</strong> donor@demo.com / Demo@1234</p>
-          <p className="mt-1"><strong>Hospital:</strong> hospital@demo.com / Demo@1234</p>
+        <div className="bg-primary-light border border-border rounded-lg p-4 mb-5">
+          <p className="font-semibold text-sm text-primary-dark mb-3">Quick Demo Login</p>
+          <div className="grid grid-cols-3 gap-2">
+            <Button 
+              type="button" 
+              variant="secondary" 
+              size="sm"
+              className="bg-white hover:bg-gray-50 border-primary/20 text-primary-dark text-xs"
+              onClick={() => {
+                setEmail('donor@demo.com');
+                setPassword('Demo@1234');
+                setError('');
+              }}
+            >
+              🩸 Donor
+            </Button>
+            <Button 
+              type="button" 
+              variant="secondary" 
+              size="sm"
+              className="bg-white hover:bg-gray-50 border-primary/20 text-primary-dark text-xs"
+              onClick={() => {
+                setEmail('hospital@demo.com');
+                setPassword('Demo@1234');
+                setError('');
+              }}
+            >
+              🏥 Hospital
+            </Button>
+            <Button 
+              type="button" 
+              variant="secondary" 
+              size="sm"
+              className="bg-white hover:bg-gray-50 border-primary/20 text-primary-dark text-xs"
+              onClick={() => {
+                setEmail('patient@demo.com');
+                setPassword('Demo@1234');
+                setError('');
+              }}
+            >
+              👤 Patient
+            </Button>
+          </div>
         </div>
 
         {error && (
@@ -93,6 +140,10 @@ export default function LoginForm() {
 
       <p className="text-center text-sm text-text-secondary mt-5">
         New donor? <Link to="/register/donor" className="text-primary font-semibold">Register here →</Link>
+      </p>
+      <p className="text-center text-sm text-text-secondary mt-2">
+        Patient or hospital?{' '}
+        <Link to="/register/patient" className="text-cta font-semibold">Create account →</Link>
       </p>
       <p className="text-center text-sm text-text-secondary mt-2">
         Need blood? <Link to="/request/create" className="text-cta font-semibold">Submit a request →</Link>

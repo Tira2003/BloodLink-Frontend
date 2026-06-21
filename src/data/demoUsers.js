@@ -29,6 +29,20 @@ export const DEMO_USERS = {
       hospitalName: 'National Hospital Colombo',
     },
   },
+  'patient@demo.com': {
+    password: 'Demo@1234',
+    user: {
+      id: 3,
+      name: 'Saman Kumara',
+      fullName: 'Saman Kumara',
+      email: 'patient@demo.com',
+      role: 'RECIPIENT',
+      bloodType: 'B+',
+      phone: '+94 77 987 6543',
+      age: 35,
+      district: 'Kandy',
+    },
+  },
 };
 
 export function tryDemoLogin(email, password) {
