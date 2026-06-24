@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Warehouse, Droplets, AlertTriangle, Plus, TrendingDown, TrendingUp } from 'lucide-react';
+import { Warehouse, Droplets, AlertTriangle, Plus, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../../components/common/Sidebar';
 import { useAuth } from '../../context/AuthContext';
@@ -59,7 +59,7 @@ export default function HospitalDashboard() {
             { label: 'Total Units in Stock', value: inventory.reduce((s, i) => s + i.units, 0), icon: TrendingUp, color: 'var(--accent-emerald)', bg: 'rgba(16,185,129,0.1)' },
           ].map(({ label, value, icon: Icon, color, bg }) => (
             <div key={label} className="glass-card stat-card">
-              <div style={{ width: '40px', height: '40px', borderRadius: 'var(--radius-md)', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color, marginBottom: '0.75rem' }}>
+              <div className="stat-icon-wrapper" style={{ color, '--icon-bg': bg }}>
                 <Icon size={20} />
               </div>
               <div className="font-extrabold text-3xl text-primary mb-1">{value}</div>

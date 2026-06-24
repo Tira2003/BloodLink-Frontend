@@ -1,4 +1,4 @@
-import { Users, Droplets, Heart, BarChart3, TrendingUp, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { Users, Droplets, Heart, BarChart3, TrendingUp, AlertTriangle, Clock } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend

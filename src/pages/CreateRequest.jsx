@@ -4,6 +4,7 @@ import { Droplets, Heart, BellRing, Clock3 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { requestService } from '../services/requestService';
 import { patientService } from '../services/patientService';
+import { emailService } from '../services/emailService';
 import PageLayout from '../components/layout/PageLayout';
 import CreateRequestForm from '../components/createRequest/CreateRequestForm';
 import SuccessCard, { SuccessLink } from '../components/ui/SuccessCard';
@@ -21,6 +22,11 @@ export default function CreateRequest() {
     setServerError('');
     try {
       await requestService.create(form);
+      try {
+        await emailService.sendRequestNotification(form, user);
+      } catch (emailErr) {
+        console.error('EmailJS notification failed:', emailErr);
+      }
       setSubmittedDistrict(form.district);
       setSuccess(true);
     } catch (err) {
@@ -40,13 +46,20 @@ export default function CreateRequest() {
               emergencyContact: form.contactPhone,
               medicalNotes: '',
             });
-          } catch (profileErr) {
+          } catch (e) {
+            console.log("Error: ", e);
+            
             // Ignore errors here. If the profile already exists (409 Conflict),
             // or we hit a CORS error on the 409, we should just proceed to retry the request.
           }
           
           // Retry request creation
           await requestService.create(form);
+          try {
+            await emailService.sendRequestNotification(form, user);
+          } catch (emailErr) {
+            console.error('EmailJS notification failed during retry:', emailErr);
+          }
           setSubmittedDistrict(form.district);
           setSuccess(true);
           return;

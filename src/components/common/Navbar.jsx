@@ -80,8 +80,8 @@ export default function Navbar() {
                   onClick={() => { setUserOpen((o) => !o); setNotifOpen(false); }}
                   className="flex items-center gap-2 rounded-full py-1 pl-1 pr-3 text-sm font-medium text-text transition-colors hover:bg-primary/10"
                 >
-                  <Avatar name={user.name} size="sm" />
-                  <span className="hidden sm:inline">{user.name.split(' ')[0]}</span>
+                  <Avatar name={user.fullName} size="sm" />
+                  <span className="hidden sm:inline">{user.fullName.split(' ')[0]}</span>
                   <ChevronDown size={14} className="text-text-muted" />
                 </button>
                 {userOpen && (

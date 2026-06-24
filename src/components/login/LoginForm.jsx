@@ -28,6 +28,8 @@ export default function LoginForm() {
   };
 
   if (user) {
+    console.log("Inside User");
+    
     navigate(getDefaultRoute(user.role), { replace: true });
     return null;
   }

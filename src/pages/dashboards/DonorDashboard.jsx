@@ -2,10 +2,10 @@ import { Heart, MapPin, Calendar, CheckCircle, Clock, Bell, Plus } from 'lucide-
 import { Link } from 'react-router-dom';
 import Sidebar from '../../components/common/Sidebar';
 import { useAuth } from '../../context/AuthContext';
-import { mockRequests, mockNotifications, mockDonors } from '../../data/mockData';
+import { mockRequests, mockNotifications } from '../../data/mockData';
 
 const URGENCY_COLORS = { CRITICAL: 'badge-critical', HIGH: 'badge-high', MEDIUM: 'badge-medium', LOW: 'badge-low' };
-const STATUS_COLORS = { PENDING: 'badge-pending', MATCHED: 'badge-matched', IN_PROGRESS: 'badge-in-progress', COMPLETED: 'badge-completed' };
+// const STATUS_COLORS = { PENDING: 'badge-pending', MATCHED: 'badge-matched', IN_PROGRESS: 'badge-in-progress', COMPLETED: 'badge-completed' };
 
 export default function DonorDashboard() {
   const { user } = useAuth();

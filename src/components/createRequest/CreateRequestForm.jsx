@@ -10,11 +10,14 @@ import Button from '../ui/Button';
 import LoadingSpinner from '../ui/LoadingSpinner';
 
 export default function CreateRequestForm({ initialData = {}, onSubmit, loading, serverError }) {
+
+  console.log("initialData: ", initialData);
+  
   const [form, setForm] = useState({
-    patientName: initialData.name || '',
+    patientName: initialData.fullName || '',
     contactPhone: initialData.phone || '',
     district: initialData.district || initialData.city || '',
-    bloodType: '',
+    bloodType:initialData.bloodType || '',
     units: 1,
     urgency: '',
     hospital: initialData.nearestHospital || '',

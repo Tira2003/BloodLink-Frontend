@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Heart, LayoutDashboard, Users, Droplets, Bell, ClipboardList,
-  BarChart3, LogOut, Warehouse, Plus, Settings, ChevronRight
+  BarChart3, LogOut, Warehouse, Plus, Settings, ChevronRight, Tent
 } from 'lucide-react';
 import { useAuth, ROLES } from '../../context/AuthContext';
 import { mockNotifications } from '../../data/mockData';
@@ -12,6 +12,7 @@ const navMap = {
     { label: 'My Profile', icon: Users, path: '/dashboard/donor/profile' },
     { label: 'Requests Near Me', icon: Droplets, path: '/requests' },
     { label: 'Donation History', icon: ClipboardList, path: '/dashboard/donor/history' },
+    { label: 'Donation Camps', icon: Tent, path: '/camps' },
     { label: 'Notifications', icon: Bell, path: '/dashboard/donor/notifications' },
   ],
   [ROLES.RECIPIENT]: [
@@ -19,6 +20,7 @@ const navMap = {
     { label: 'Create Request', icon: Plus, path: '/request/create' },
     { label: 'My Requests', icon: ClipboardList, path: '/dashboard/recipient/requests' },
     { label: 'Find Donors', icon: Users, path: '/donors' },
+    { label: 'Donation Camps', icon: Tent, path: '/camps' },
     { label: 'Notifications', icon: Bell, path: '/dashboard/recipient/notifications' },
   ],
   [ROLES.HOSPITAL]: [
@@ -26,6 +28,7 @@ const navMap = {
     { label: 'Blood Inventory', icon: Warehouse, path: '/dashboard/hospital/inventory' },
     { label: 'All Requests', icon: ClipboardList, path: '/requests' },
     { label: 'Create Request', icon: Plus, path: '/request/create' },
+    { label: 'Donation Camps', icon: Tent, path: '/camps' },
     { label: 'Notifications', icon: Bell, path: '/dashboard/hospital/notifications' },
   ],
   [ROLES.ADMIN]: [
@@ -34,6 +37,7 @@ const navMap = {
     { label: 'All Requests', icon: ClipboardList, path: '/requests' },
     { label: 'Inventory', icon: Warehouse, path: '/dashboard/hospital/inventory' },
     { label: 'Analytics', icon: BarChart3, path: '/dashboard/admin/analytics' },
+    { label: 'Donation Camps', icon: Tent, path: '/camps' },
     { label: 'Settings', icon: Settings, path: '/dashboard/admin/settings' },
   ],
 };
