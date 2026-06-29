@@ -94,7 +94,7 @@ export default function Sidebar() {
           </div>
         </div>
         <button
-          className="btn btn-danger btn-sm w-full"
+          className="btn btn-success btn-sm w-full"
           id="sidebar-logout"
           onClick={() => { logout(); navigate('/'); }}
         >
